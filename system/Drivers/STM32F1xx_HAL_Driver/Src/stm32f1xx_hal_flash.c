@@ -664,6 +664,13 @@ HAL_StatusTypeDef HAL_FLASH_Unlock(void)
     WRITE_REG(FLASH->KEYR, FLASH_KEY1);
     WRITE_REG(FLASH->KEYR, FLASH_KEY2);
 
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+
     /* Verify Flash is unlocked */
     if(READ_BIT(FLASH->CR, FLASH_CR_LOCK) != RESET)
     {
@@ -676,6 +683,13 @@ HAL_StatusTypeDef HAL_FLASH_Unlock(void)
     /* Authorize the FLASH BANK2 Registers access */
     WRITE_REG(FLASH->KEYR2, FLASH_KEY1);
     WRITE_REG(FLASH->KEYR2, FLASH_KEY2);
+
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
 
     /* Verify Flash BANK2 is unlocked */
     if(READ_BIT(FLASH->CR2, FLASH_CR2_LOCK) != RESET)

@@ -569,74 +569,62 @@ void dac_stop(PinName pin)
   * @param hadc: ADC handle pointer
   * @retval None
   */
+extern DMA_HandleTypeDef hdma_adc1;
 void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
-  /*##-1- Enable peripherals and GPIO Clocks #################################*/
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* ADC Periph clock enable */
-  if (hadc->Instance == ADC1) {
-#ifdef __HAL_RCC_ADC1_CLK_ENABLE
+  if(hadc->Instance==ADC1)
+  {
+    __HAL_RCC_AFIO_CLK_ENABLE();
     __HAL_RCC_ADC1_CLK_ENABLE();
-#endif
-#ifdef __HAL_RCC_ADC12_CLK_ENABLE
-    __HAL_RCC_ADC12_CLK_ENABLE();
-#endif
+
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
+    /* DMA controller clock enable */
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    /**ADC1 GPIO Configuration    
+    PA6     ------> ADC1_IN6
+    PC4     ------> ADC1_IN14
+    PB0     ------> ADC1_IN8 
+    */
+
+    // GPIO_InitStruct.Pin = GPIO_PIN_0;
+    // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    // HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+
+    hdma_adc1.Instance = DMA1_Channel1;
+    hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_adc1.Init.Mode = DMA_CIRCULAR;
+    hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
+    {
+
+    }
+
+    __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc1);
   }
-#ifdef ADC2
-  else if (hadc->Instance == ADC2) {
-#ifdef __HAL_RCC_ADC2_CLK_ENABLE
-    __HAL_RCC_ADC2_CLK_ENABLE();
-#endif
-#ifdef __HAL_RCC_ADC12_CLK_ENABLE
-    __HAL_RCC_ADC12_CLK_ENABLE();
-#endif
-  }
-#endif
-#ifdef ADC3
-  else if (hadc->Instance == ADC3) {
-#ifdef __HAL_RCC_ADC3_CLK_ENABLE
-    __HAL_RCC_ADC3_CLK_ENABLE();
-#endif
-#ifdef __HAL_RCC_ADC34_CLK_ENABLE
-    __HAL_RCC_ADC34_CLK_ENABLE();
-#endif
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_CLK_ENABLE();
-#endif
-  }
-#endif
-#ifdef ADC4
-  else if (hadc->Instance == ADC4) {
-#ifdef __HAL_RCC_ADC34_CLK_ENABLE
-    __HAL_RCC_ADC34_CLK_ENABLE();
-#endif
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_CLK_ENABLE();
-#endif
-  }
-#endif
-#ifdef ADC5
-  else if (hadc->Instance == ADC5) {
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_CLK_ENABLE();
-#endif
-  }
-#endif
-#ifdef __HAL_RCC_ADC_CLK_ENABLE
-  __HAL_RCC_ADC_CLK_ENABLE();
-#endif
   /* For STM32F1xx, STM32H7xx, and STM32MP1xx ADC prescaler is configured in
      SystemClock_Config (variant.cpp) */
-#if defined(__HAL_RCC_ADC_CONFIG) && !defined(STM32F1xx) && \
-    !defined(STM32H7xx) && !defined(STM32MP1xx)
   /* ADC Periph interface clock configuration */
-  __HAL_RCC_ADC_CONFIG(RCC_ADCCLKSOURCE_SYSCLK);
-#endif
 
   /* Configure ADC GPIO pin */
-  if (!(g_current_pin & PADC_BASE)) {
-    pinmap_pinout(g_current_pin, PinMap_ADC);
-  }
 }
+
 
 /**
   * @brief  DeInitializes the ADC MSP.
@@ -645,115 +633,35 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
   */
 void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 {
-#ifdef __HAL_RCC_ADC_FORCE_RESET
-  __HAL_RCC_ADC_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC_RELEASE_RESET
-  __HAL_RCC_ADC_RELEASE_RESET();
-#endif
 
-  if (hadc->Instance == ADC1) {
-#ifdef __HAL_RCC_ADC1_FORCE_RESET
-    __HAL_RCC_ADC1_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC1_RELEASE_RESET
-    __HAL_RCC_ADC1_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC12_FORCE_RESET
-    __HAL_RCC_ADC12_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC12_RELEASE_RESET
-    __HAL_RCC_ADC12_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC1_CLK_DISABLE
+  if(hadc->Instance==ADC1)
+  {
+  /* USER CODE BEGIN ADC1_MspDeInit 0 */
+
+  /* USER CODE END ADC1_MspDeInit 0 */
+    /* Peripheral clock disable */
     __HAL_RCC_ADC1_CLK_DISABLE();
-#endif
-#ifdef __HAL_RCC_ADC12_CLK_DISABLE
-    __HAL_RCC_ADC12_CLK_DISABLE();
-#endif
+  
+    /**ADC1 GPIO Configuration    
+    PA6     ------> ADC1_IN6
+    PC4     ------> ADC1_IN14
+    PB0     ------> ADC1_IN8 
+    */
+    //HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0);
+
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_1);
+
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_3);
+
+    /* ADC1 DMA DeInit */
+    HAL_DMA_DeInit(hadc->DMA_Handle);
+  /* USER CODE BEGIN ADC1_MspDeInit 1 */
+
+  /* USER CODE END ADC1_MspDeInit 1 */
   }
-#ifdef ADC2
-  else if (hadc->Instance == ADC2) {
-#ifdef __HAL_RCC_ADC2_FORCE_RESET
-    __HAL_RCC_ADC2_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC2_RELEASE_RESET
-    __HAL_RCC_ADC2_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC12_FORCE_RESET
-    __HAL_RCC_ADC12_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC12_RELEASE_RESET
-    __HAL_RCC_ADC12_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC2_CLK_DISABLE
-    __HAL_RCC_ADC2_CLK_DISABLE();
-#endif
-#ifdef __HAL_RCC_ADC2_CLK_DISABLE
-    __HAL_RCC_ADC2_CLK_DISABLE();
-#endif
+
   }
-#endif
-#ifdef ADC3
-  else if (hadc->Instance == ADC3) {
-#ifdef __HAL_RCC_ADC3_FORCE_RESET
-    __HAL_RCC_ADC3_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC3_RELEASE_RESET
-    __HAL_RCC_ADC3_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC34_FORCE_RESET
-    __HAL_RCC_ADC34_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC34_RELEASE_RESET
-    __HAL_RCC_ADC34_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC3_CLK_DISABLE
-    __HAL_RCC_ADC3_CLK_DISABLE();
-#endif
-#ifdef __HAL_RCC_ADC34_CLK_DISABLE
-    __HAL_RCC_ADC34_CLK_DISABLE();
-#endif
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_FORCE_RESET();
-    __HAL_RCC_ADC345_RELEASE_RESET();
-    __HAL_RCC_ADC345_CLK_DISABLE();
-#endif
-  }
-#endif
-#ifdef ADC4
-  else if (hadc->Instance == ADC4) {
-#ifdef __HAL_RCC_ADC34_FORCE_RESET
-    __HAL_RCC_ADC34_FORCE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC34_RELEASE_RESET
-    __HAL_RCC_ADC34_RELEASE_RESET();
-#endif
-#ifdef __HAL_RCC_ADC34_CLK_DISABLE
-    __HAL_RCC_ADC34_CLK_DISABLE();
-#endif
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_FORCE_RESET();
-    __HAL_RCC_ADC345_RELEASE_RESET();
-    __HAL_RCC_ADC345_CLK_DISABLE();
-#endif
-  }
-#endif
-#ifdef ADC5
-  else if (hadc->Instance == ADC5) {
-#if defined(ADC345_COMMON)
-    __HAL_RCC_ADC345_FORCE_RESET();
-    __HAL_RCC_ADC345_RELEASE_RESET();
-    __HAL_RCC_ADC345_CLK_DISABLE();
-#endif
-  }
-#endif
-#ifdef __HAL_RCC_ADC_CLK_DISABLE
-  __HAL_RCC_ADC_FORCE_RESET();
-  __HAL_RCC_ADC_RELEASE_RESET();
-  __HAL_RCC_ADC_CLK_DISABLE();
-#endif
-}
+
 
 /**
   * @brief  This function will set the ADC to the required value

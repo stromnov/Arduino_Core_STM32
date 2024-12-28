@@ -60,7 +60,7 @@ class SoftwareSerial : public Stream {
     unsigned char _receive_buffer[_SS_MAX_RX_BUFF];
     volatile uint8_t _receive_buffer_tail;
     volatile uint8_t _receive_buffer_head;
-
+    
     uint32_t delta_start = 0;
 
     // static data
@@ -121,6 +121,8 @@ class SoftwareSerial : public Stream {
     static void setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority);
 
     using Print::write;
+
+    uint8_t get_receive_buffer_tail() { return _receive_buffer_tail;}
 };
 
 #endif // SOFTWARESERIAL_H

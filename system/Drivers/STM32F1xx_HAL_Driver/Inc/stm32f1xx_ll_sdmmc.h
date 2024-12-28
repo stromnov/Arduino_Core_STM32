@@ -711,7 +711,7 @@ typedef struct
 #define SDIO_INIT_CLK_DIV     ((uint8_t)0x76)    /* 48MHz / (SDMMC_INIT_CLK_DIV + 2) < 400KHz */
 
 /* SDIO Data Transfer Frequency (25MHz max) */
-#define SDIO_TRANSFER_CLK_DIV ((uint8_t)0x4)
+#define SDIO_TRANSFER_CLK_DIV ((uint8_t)0x10)
 /**
   * @}
   */

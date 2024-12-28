@@ -140,6 +140,16 @@ static inline uint32_t get_flash_end(void)
 #ifndef FLASH_BASE_ADDRESS
 #error "FLASH_BASE_ADDRESS could not be defined"
 #endif
+
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#pragma message("FLASH_BASE_ADDRESS: " STR(FLASH_BASE_ADDRESS))
+#pragma message("EEPROM_RETRAM_START_ADDRESS: " STR(EEPROM_RETRAM_START_ADDRESS))
+#pragma message("FLASH_END: " STR(FLASH_END))
+#pragma message("E2END: " STR(E2END))
+#pragma message("EEPROM_RETRAM_MODE_SIZE: " STR(EEPROM_RETRAM_MODE_SIZE))
+#pragma message("EEPROM_RETRAM_START_ADDRESS: " STR(EEPROM_RETRAM_START_ADDRESS))
+
 #endif /* FLASH_BASE_ADDRESS */
 
 static uint8_t eeprom_buffer[E2END + 1] __attribute__((aligned(8))) = {0};
